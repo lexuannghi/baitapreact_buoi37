@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import './studentform.css';
+import React, { useState } from "react";
+import "./studentform.css";
 
 const StudentForm = () => {
   const [students, setStudents] = useState([]);
   const [newStudent, setNewStudent] = useState({
-    maSV: '',
-    hoTen: '',
-    soDienThoai: '',
-    email: '',
+    maSV: "",
+    hoTen: "",
+    soDienThoai: "",
+    email: "",
   });
   const [editingIndex, setEditingIndex] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [formError, setFormError] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [formError, setFormError] = useState("");
   const [editingMode, setEditingMode] = useState(false);
 
   const handleInputChange = (e) => {
@@ -27,82 +27,98 @@ const StudentForm = () => {
       const editedStudent = students[editingIndex];
       return (
         students.some(
-          (student) =>
+          (student, index) =>
             student.maSV.toLowerCase() === newStudent.maSV.toLowerCase() &&
-            (!editedStudent || newStudent.maSV.toLowerCase() !== editedStudent.maSV.toLowerCase())
+            (!editingMode || (editingMode && index !== editingIndex))
         )
       );
     }
     return false;
   };
-  
+
   const isPhoneNumberExists = () => {
     if (newStudent && newStudent.soDienThoai) {
       const editedStudent = students[editingIndex];
       return (
         students.some(
-          (student) =>
+          (student, index) =>
             student.soDienThoai === newStudent.soDienThoai &&
-            (!editedStudent || newStudent.soDienThoai !== editedStudent.soDienThoai)
+            (!editingMode || (editingMode && index !== editingIndex))
         )
       );
     }
     return false;
   };
-  
+
   const isEmailExists = () => {
     if (newStudent && newStudent.email) {
       const editedStudent = students[editingIndex];
       return (
         students.some(
-          (student) =>
+          (student, index) =>
             student.email === newStudent.email &&
-            (!editedStudent || newStudent.email !== editedStudent.email)
+            (!editingMode || (editingMode && index !== editingIndex))
         )
       );
     }
     return false;
   };
-  
 
   const handleAddStudent = () => {
-    if (validateForm() && !isStudentExists() && !isPhoneNumberExists() && !isEmailExists()) {
+    if (validateForm()) {
       if (editingMode) {
         const updatedStudents = [...students];
-        updatedStudents[editingIndex] = newStudent;
-        setStudents(updatedStudents);
-        setEditingIndex(null);
-        setEditingMode(false);
+        const isDuplicate =
+          students.some(
+            (student, index) =>
+              index !== editingIndex &&
+              (student.maSV.toLowerCase() === newStudent.maSV.toLowerCase() ||
+                student.soDienThoai === newStudent.soDienThoai ||
+                student.email === newStudent.email)
+          );
+        if (!isDuplicate) {
+          updatedStudents[editingIndex] = newStudent;
+          setStudents(updatedStudents);
+          setEditingIndex(null);
+          setEditingMode(false);
+          setFormError("");
+        } else {
+          setFormError("Thông tin bạn sửa bị trùng lặp với danh sách đã có");
+        }
       } else {
-        setStudents((prevStudents) => [...prevStudents, { ...newStudent }]);
+        const isDuplicate = students.some(
+          (student) =>
+            student.maSV.toLowerCase() === newStudent.maSV.toLowerCase() ||
+            student.soDienThoai === newStudent.soDienThoai ||
+            student.email === newStudent.email
+        );
+        if (!isDuplicate) {
+          setStudents((prevStudents) => [...prevStudents, { ...newStudent }]);
+          setNewStudent({
+            maSV: "",
+            hoTen: "",
+            soDienThoai: "",
+            email: "",
+          });
+          setFormError("");
+        } else {
+          setFormError("Thông tin của bạn bị trùng lặp với danh sách đã có");
+        }
       }
-
-      // Reset form
-      setNewStudent({
-        maSV: '',
-        hoTen: '',
-        soDienThoai: '',
-        email: '',
-      });
-      setFormError('');
-    } else if (!editingMode && isStudentExists()) {
-      setFormError('Mã sinh viên đã tồn tại trong danh sách');
-    } else if (!editingMode && isPhoneNumberExists()) {
-      setFormError('Số điện thoại đã tồn tại trong danh sách');
-    } else if (!editingMode && isEmailExists()) {
-      setFormError('Email đã tồn tại trong danh sách');
     } else {
-      setFormError('Vui lòng điền đầy đủ thông tin sinh viên');
+      setFormError("Vui lòng điền đầy đủ thông tin sinh viên");
     }
   };
 
   const handleEditStudent = (index) => {
     // Bắt đầu chỉnh sửa sinh viên
-    const studentToEdit = students[index];
+    const studentToEdit = filteredStudents[index];
     setNewStudent({ ...studentToEdit });
     setEditingIndex(index);
     setEditingMode(true);
+    setFormError("");
   };
+  
 
   const handleDeleteStudent = (index) => {
     const updatedStudents = [...students];
@@ -120,10 +136,10 @@ const StudentForm = () => {
 
   const validateForm = () => {
     return (
-      newStudent.maSV.trim() !== '' &&
-      newStudent.hoTen.trim() !== '' &&
-      newStudent.soDienThoai.trim() !== '' &&
-      newStudent.email.trim() !== ''
+      newStudent.maSV.trim() !== "" &&
+      newStudent.hoTen.trim() !== "" &&
+      newStudent.soDienThoai.trim() !== "" &&
+      newStudent.email.trim() !== ""
     );
   };
 
@@ -134,10 +150,10 @@ const StudentForm = () => {
         <form>
           <div className="d-flex">
             <div className="form1 row d-flex">
-              <label style={{ width: '100%' }}>Mã SV:</label>
+              <label style={{ width: "100%" }}>Mã SV:</label>
               <input type="text" name="maSV" value={newStudent.maSV} onChange={handleInputChange} />
-              
-              <label style={{ width: '100%', marginTop: '12px' }}>Họ tên:</label>
+
+              <label style={{ width: "100%", marginTop: "10px" }}>Họ tên:</label>
               <input
                 type="text"
                 name="hoTen"
@@ -147,37 +163,36 @@ const StudentForm = () => {
             </div>
 
             <div className="form2 row d-flex">
-              <label style={{ width: '100%' }}>Số điện thoại:</label>
+              <label style={{ width: "100%" }}>Số điện thoại:</label>
               <input
                 type="text"
                 name="soDienThoai"
                 value={newStudent.soDienThoai}
                 onChange={handleInputChange}
               />
-              
-              <label style={{ width: '100%', marginTop: '15px' }}>Email:</label>
+
+              <label style={{ width: "100%", marginTop: "15px" }}>Email:</label>
               <input
                 type="text"
                 name="email"
                 value={newStudent.email}
                 onChange={handleInputChange}
               />
-              
             </div>
           </div>
 
           <button type="button" onClick={handleAddStudent}>
-            {editingMode ? 'Cập nhật sinh viên' : 'Thêm sinh viên'}
+            {editingMode ? "Cập nhật sinh viên" : "Thêm sinh viên"}
           </button>
 
-          {formError && <p style={{ color: 'red' }}>{formError}</p>}
+          {formError && <p style={{ color: "red" }}>{formError}</p>}
         </form>
       </div>
 
       <div className="container search">
         <h2>Danh sách sinh viên</h2>
         <input
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           type="text"
           placeholder="Tìm kiếm theo tên"
           value={searchTerm}
@@ -190,7 +205,7 @@ const StudentForm = () => {
               <th>Họ tên</th>
               <th>Số điện thoại</th>
               <th>Email</th>
-              <th style={{ paddingLeft: '25px' }}>Thao tác</th>
+              <th style={{ paddingLeft: "25px" }}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -201,10 +216,7 @@ const StudentForm = () => {
                 <td>{student.soDienThoai}</td>
                 <td>{student.email}</td>
                 <td>
-                  <button
-                    style={{ marginRight: '5px' }}
-                    onClick={() => handleEditStudent(index)}
-                  >
+                  <button style={{ marginRight: "5px" }} onClick={() => handleEditStudent(index)}>
                     Sửa
                   </button>
                   <button onClick={() => handleDeleteStudent(index)}>Xoá</button>
