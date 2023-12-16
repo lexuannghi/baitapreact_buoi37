@@ -8,11 +8,12 @@
   width: 100%;
 }
 .form-container input{
-  padding: 5px 0;
   width: 90%;
+  height: 30px;
 }
 .d-flex {
   display: flex;
+  height: auto;
 }
 .row {
   flex-wrap: wrap;
