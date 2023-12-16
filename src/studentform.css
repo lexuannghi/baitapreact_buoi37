@@ -1,0 +1,56 @@
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  justify-content: space-around;
+}
+
+.form-container {
+  width: 100%;
+}
+.form-container input{
+  padding: 5px 0;
+  width: 90%;
+}
+.d-flex {
+  display: flex;
+}
+.row {
+  flex-wrap: wrap;
+}
+
+.form1 {
+  width: 100%;
+}
+.form2 {
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 10px;
+}
+
+th {
+  background-color: #373737;
+  color: white;
+  text-align: left;
+}
+
+button {
+  padding: 8px;
+  margin-top: 15px;
+  background-color: green;
+  color: white;
+  border: 0;
+  font-size: 16px;
+  border-radius: 5px
+}
+.search input{
+  max-width: 1120px;
+  padding: 8px;
+}
